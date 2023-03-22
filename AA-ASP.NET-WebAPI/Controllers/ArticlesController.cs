@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using TheAzureArchiveAPI.Helpers;
-using TheAzureArchiveAPI.Models;
 using TheAzureArchiveAPI.Services;
+using TheAzureArchiveAPI.DataTransferObjects;
+using TheAzureArchiveAPI.DataTransferObjects.CreateUpdateObjects;
+using TheAzureArchiveAPI.Models;
+using TheAzureArchiveAPI.DataTransferObjects.PatchObjects;
 
 namespace TheAzureArchiveAPI.Controllers
 {
@@ -52,7 +55,7 @@ namespace TheAzureArchiveAPI.Controllers
                 }
                 return new JsonResult(Ok(article));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError($"GetArticleById error: {ex.Message}");
                 return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
@@ -60,22 +63,81 @@ namespace TheAzureArchiveAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddArticleAsync([FromBody] Article article)
+        public async Task<IActionResult> CreateArticleAsync([FromBody] GetArticle article)
         {
             try
             {
-                _logger.LogInformation("AddArticleAsync started");
+                _logger.LogInformation("CreateArticleAsync started");
                 if (article == null)
                 {
                     return BadRequest(ErrorMessagesEnum.BadRequest);
                 }
-                await _articlesService.AddArticleAsync(article);
-                return new JsonResult(Ok(SuccessMessageEnum.ElementSuccessfullyAdded));
+                await _articlesService.CreateArticleAsync(article);
+                return new JsonResult(Ok(SuccessMessageEnum.ElementSuccessfullyCreated));
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Validation exception: {ex.Message}");
                 return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateArticle([FromRoute] Guid id, [FromBody] CreateUpdateArticle article)
+        {
+            try
+            {
+                _logger.LogInformation($"UpdateArticle started");
+                if (article == null)
+                {
+                    return BadRequest(ErrorMessagesEnum.BadRequest);
+                }
+                CreateUpdateArticle updatedArticle = await _articlesService.UpdateArticleAsync(id, article);
+                if (updatedArticle == null)
+                {
+                    return StatusCode((int)HttpStatusCode.NoContent, ErrorMessagesEnum.NoElementFound);
+                }
+                return new JsonResult(Ok(SuccessMessageEnum.ElementSuccessfullyUpdated));
+            }
+            catch (ModelValidationException ex)
+            {
+                _logger.LogError($"Validation exception {ex.Message}");
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Validation exception {ex.Message}");
+                return StatusCode((int)(HttpStatusCode.InternalServerError), ex.Message);
+            }
+        }
+
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> PartiallyUpdateArticle([FromRoute] Guid id, [FromBody] PatchArticle article)
+        {
+            try
+            {
+                _logger.LogInformation($"PartiallyUpdateArticle started");
+                if (article == null)
+                {
+                    return BadRequest(ErrorMessagesEnum.BadRequest);
+                }
+
+                PatchArticle updatedArticle = await _articlesService.PartiallyUpdateArticleAsync(id, article);
+                if (updatedArticle == null)
+                {
+                    return StatusCode((int)HttpStatusCode.NoContent, ErrorMessagesEnum.NoElementFound);
+                }
+                return new JsonResult(Ok(SuccessMessageEnum.ElementSuccessfullyUpdated));
+            }
+            catch (ModelValidationException ex)
+            {
+                _logger.LogError($"Validation exception {ex.Message}");
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Validation exception {ex.Message}");
+                return StatusCode((int)(HttpStatusCode.InternalServerError), ex.Message);
             }
         }
 

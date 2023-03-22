@@ -1,9 +1,12 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
-namespace TheAzureArchiveAPI.Models
+namespace TheAzureArchiveAPI.DataTransferObjects.CreateUpdateObjects
 {
-    public class Article
+    public class CreateUpdateArticle
     {
+        [Key]
+        [JsonIgnore]
         public Guid Id { get; set; }
 
         [Required(ErrorMessage = "This field is mandatory")]

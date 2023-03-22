@@ -2,8 +2,8 @@
 {
     public static class SuccessMessageEnum
     {
-        public const string ElementSuccessfullyAdded = "The element was added";
-        public const string ElementSuccessfullyEdited = "The element was edited";
+        public const string ElementSuccessfullyCreated = "The element was created";
+        public const string ElementSuccessfullyUpdated = "The element was updated";
         public const string ElementSuccessfullyDeleted = "The element was deleted";
     }
 }

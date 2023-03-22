@@ -31,6 +31,7 @@ internal class Program
         builder.Services.AddTransient<IArticlesRepository, ArticlesRepository>();
         builder.Services.AddTransient<IArticlesService, ArticlesService>();
 
+        builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         var app = builder.Build();
         
         if (app.Environment.IsDevelopment())
