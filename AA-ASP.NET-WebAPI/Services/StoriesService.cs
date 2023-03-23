@@ -1,4 +1,6 @@
-﻿using TheAzureArchiveAPI.Models;
+﻿using TheAzureArchiveAPI.DataTransferObjects.GetObjects;
+using TheAzureArchiveAPI.DataTransferObjects.PatchObjects;
+using TheAzureArchiveAPI.DataTransferObjects.UpdateObjects;
 using TheAzureArchiveAPI.Repositories;
 
 namespace TheAzureArchiveAPI.Services
@@ -22,9 +24,19 @@ namespace TheAzureArchiveAPI.Services
             return await _repository.GetStoryByIdAsync(id);
         }
 
-        public async Task AddStoryAsync(Story story)
+        public async Task CreateStoryAsync(Story story)
         {
-            await _repository.AddStoryAsync(story);
+            await _repository.CreateStoryAsync(story);
+        }
+
+        public async Task<UpdateStory> UpdateStoryAsync(Guid id, UpdateStory story)
+        {
+            return await _repository.UpdateStoryAsync(id, story);
+        }
+
+        public async Task<PatchStory> PartiallyUpdateStoryAsync(Guid id, PatchStory story)
+        {
+            return await _repository.PartiallyUpdateStoryAsync(id, story);
         }
 
         public async Task<bool> DeleteStoryAsync(Guid id)

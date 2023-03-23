@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using TheAzureArchiveAPI.DataContext;
-using TheAzureArchiveAPI.DataTransferObjects;
-using TheAzureArchiveAPI.DataTransferObjects.CreateUpdateObjects;
+using TheAzureArchiveAPI.DataTransferObjects.GetObjects;
+using TheAzureArchiveAPI.DataTransferObjects.UpdateObjects;
 using TheAzureArchiveAPI.DataTransferObjects.PatchObjects;
 
 namespace TheAzureArchiveAPI.Repositories
@@ -18,16 +18,16 @@ namespace TheAzureArchiveAPI.Repositories
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<GetArticle>> GetArticlesAsync()
+        public async Task<IEnumerable<Article>> GetArticlesAsync()
         {
             return await _context.Articles.ToListAsync();
         }
-        public async Task<GetArticle> GetArticleByIdAsync(Guid id)
+        public async Task<Article> GetArticleByIdAsync(Guid id)
         {
             return await _context.Articles.SingleOrDefaultAsync(a => a.Id == id);
         }
 
-        public async Task CreateArticleAsync(GetArticle article)
+        public async Task CreateArticleAsync(Article article)
         {
             article.Id = Guid.NewGuid();
             _context.Articles.Add(article);
@@ -39,11 +39,11 @@ namespace TheAzureArchiveAPI.Repositories
             return await _context.Articles.CountAsync(a => a.Id == id) > 0;
         }
 
-        public async Task<CreateUpdateArticle> UpdateArticleAsync(Guid id, CreateUpdateArticle article)
+        public async Task<UpdateArticle> UpdateArticleAsync(Guid id, UpdateArticle article)
         {
             if (!await ArticleExistsAsync(id)) { return null; }
 
-            var articleUpdated = _mapper.Map<GetArticle>(article);
+            var articleUpdated = _mapper.Map<Article>(article);
             articleUpdated.Id = id;
             _context.Articles.Update(articleUpdated);
             await _context.SaveChangesAsync();
@@ -82,7 +82,7 @@ namespace TheAzureArchiveAPI.Repositories
 
         public async Task<bool> DeleteArticleAsync(Guid id)
         {
-            GetArticle article = await GetArticleByIdAsync(id);
+            Article article = await GetArticleByIdAsync(id);
             if (article == null) { return false; }
             _context.Articles.Remove(article);
             await _context.SaveChangesAsync(true);

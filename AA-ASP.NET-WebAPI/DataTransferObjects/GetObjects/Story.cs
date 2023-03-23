@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TheAzureArchiveAPI.Models
+namespace TheAzureArchiveAPI.DataTransferObjects.GetObjects
 {
     public class Story
     {
+        [Key]
         public Guid Id { get; set; }
 
         [Required(ErrorMessage = "This field is mandatory")]

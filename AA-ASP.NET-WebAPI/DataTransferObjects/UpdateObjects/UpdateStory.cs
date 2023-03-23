@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace TheAzureArchiveAPI.DataTransferObjects.CreateUpdateObjects
+namespace TheAzureArchiveAPI.DataTransferObjects.UpdateObjects
 {
-    public class CreateUpdateArticle
+    public class UpdateStory
     {
         [Key]
         [JsonIgnore]
@@ -12,6 +12,10 @@ namespace TheAzureArchiveAPI.DataTransferObjects.CreateUpdateObjects
         [Required(ErrorMessage = "This field is mandatory")]
         [StringLength(250, ErrorMessage = "Title field may only contain a maximum of 250 characters")]
         public string Title { get; set; }
+
+        [Required(ErrorMessage = "This field is mandatory")]
+        [StringLength(250, ErrorMessage = "Series field may only contain a maximum of 250 characters")]
+        public string Series { get; set; }
 
         [Required(ErrorMessage = "This field is mandatory")]
         [StringLength(250, ErrorMessage = "Author field may only contain a maximum of 250 characters")]

@@ -1,5 +1,5 @@
-﻿using TheAzureArchiveAPI.DataTransferObjects;
-using TheAzureArchiveAPI.DataTransferObjects.CreateUpdateObjects;
+﻿using TheAzureArchiveAPI.DataTransferObjects.GetObjects;
+using TheAzureArchiveAPI.DataTransferObjects.UpdateObjects;
 using TheAzureArchiveAPI.DataTransferObjects.PatchObjects;
 using TheAzureArchiveAPI.Repositories;
 
@@ -14,20 +14,20 @@ namespace TheAzureArchiveAPI.Services
             _repository = repository;
         }
 
-        public async Task<IEnumerable<GetArticle>> GetArticlesAsync()
+        public async Task<IEnumerable<Article>> GetArticlesAsync()
         {
             return await _repository.GetArticlesAsync();
         }
-        public async Task<GetArticle> GetArticleByIdAsync(Guid id)
+        public async Task<Article> GetArticleByIdAsync(Guid id)
         {
             return await _repository.GetArticleByIdAsync(id);
         }
 
-        public async Task CreateArticleAsync(GetArticle article)
+        public async Task CreateArticleAsync(Article article)
         {
             await _repository.CreateArticleAsync(article);
         }
-        public async Task<CreateUpdateArticle> UpdateArticleAsync(Guid id, CreateUpdateArticle article)
+        public async Task<UpdateArticle> UpdateArticleAsync(Guid id, UpdateArticle article)
         {
             return await _repository.UpdateArticleAsync(id, article);
         }

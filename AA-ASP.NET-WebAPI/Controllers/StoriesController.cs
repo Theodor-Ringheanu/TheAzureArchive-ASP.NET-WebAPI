@@ -1,83 +1,164 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Net;
-using TheAzureArchiveAPI.DataContext;
+using TheAzureArchiveAPI.Helpers;
+using TheAzureArchiveAPI.Services;
+using TheAzureArchiveAPI.DataTransferObjects.GetObjects;
+using TheAzureArchiveAPI.DataTransferObjects.UpdateObjects;
 using TheAzureArchiveAPI.Models;
+using TheAzureArchiveAPI.DataTransferObjects.PatchObjects;
 
 namespace TheAzureArchiveAPI.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
     public class StoriesController : ControllerBase
     {
-        private readonly TheAzureArchiveDataContext _context;
-        public StoriesController(TheAzureArchiveDataContext context)
+        private readonly IStoriesService _storiesService;
+        private readonly ILogger<StoriesController> _logger;
+
+        public StoriesController(IStoriesService storiesService, ILogger<StoriesController> logger)
         {
-            _context = context;
+            _storiesService = storiesService;
+            _logger = logger;
         }
 
-        [Route("GetAllStories")]
         [HttpGet]
-        public async Task<IActionResult> GetAllStories()
+        public async Task<IActionResult> GetStoriesAsync()
         {
             try
             {
-                var stories = await _context.Stories.ToListAsync();
+                _logger.LogInformation("GetStoriesAsync started");
+                var stories = await _storiesService.GetStoriesAsync();
                 if (stories == null || !stories.Any())
-                    return StatusCode((int)HttpStatusCode.NoContent, "No story");
+                {
+                    return NotFound(ErrorMessagesEnum.NoElementFound);
+                }
                 return new JsonResult(Ok(stories));
             }
             catch (Exception ex)
             {
+                _logger.LogError($"GetStories error: {ex.Message}");
+                return NotFound(ErrorMessagesEnum.NoElementFound);
+            }
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetStoryByIdAsync([FromRoute] Guid id)
+        {
+            try
+            {
+                _logger.LogInformation("GetStoryByIdAsync started");
+                var story = await _storiesService.GetStoryByIdAsync(id);
+                if (story == null)
+                {
+                    return NotFound(ErrorMessagesEnum.NoElementFound);
+                }
+                return new JsonResult(Ok(story));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"GetStoryById error: {ex.Message}");
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateStoryAsync([FromBody] Story story)
+        {
+            try
+            {
+                _logger.LogInformation("CreateStoryAsync started");
+                if (story == null)
+                {
+                    return BadRequest(ErrorMessagesEnum.BadRequest);
+                }
+                await _storiesService.CreateStoryAsync(story);
+                return new JsonResult(Ok(SuccessMessageEnum.ElementSuccessfullyCreated));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Validation exception: {ex.Message}");
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+            }
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateStory([FromRoute] Guid id, [FromBody] UpdateStory story)
+        {
+            try
+            {
+                _logger.LogInformation($"UpdateStory started");
+                if (story == null)
+                {
+                    return BadRequest(ErrorMessagesEnum.BadRequest);
+                }
+                UpdateStory updatedStory = await _storiesService.UpdateStoryAsync(id, story);
+                if (updatedStory == null)
+                {
+                    return StatusCode((int)HttpStatusCode.NoContent, ErrorMessagesEnum.NoElementFound);
+                }
+                return Ok(SuccessMessageEnum.ElementSuccessfullyUpdated);
+            }
+            catch (ModelValidationException ex)
+            {
+                _logger.LogError($"Validation exception {ex.Message}");
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Validation exception {ex.Message}");
                 return StatusCode((int)(HttpStatusCode.InternalServerError), ex.Message);
             }
         }
 
-        [Route("GetStoryById")]
-        [HttpGet]
-        public async Task<IActionResult> GetStoryById(Guid id)
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> PartiallyUpdateStory([FromRoute] Guid id, [FromBody] PatchStory story)
         {
-            var storyById =  await _context.Stories.FindAsync(id);
-            if (storyById == null)
-                return new JsonResult(new { error = $"Story with ID {id} not found" }) { StatusCode = 404 };
+            try
+            {
+                _logger.LogInformation($"PartiallyUpdateStory started");
+                if (story == null)
+                {
+                    return BadRequest(ErrorMessagesEnum.BadRequest);
+                }
 
-            return new JsonResult(Ok(storyById));
+                PatchStory updatedStory = await _storiesService.PartiallyUpdateStoryAsync(id, story);
+                if (updatedStory == null)
+                {
+                    return StatusCode((int)HttpStatusCode.NoContent, ErrorMessagesEnum.NoElementFound);
+                }
+                return new JsonResult(Ok(SuccessMessageEnum.ElementSuccessfullyUpdated));
+            }
+            catch (ModelValidationException ex)
+            {
+                _logger.LogError($"Validation exception {ex.Message}");
+                return BadRequest(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Validation exception {ex.Message}");
+                return StatusCode((int)(HttpStatusCode.InternalServerError), ex.Message);
+            }
         }
 
-        [Route("AddStory")]
-        [HttpPost]
-        public async Task<IActionResult> AddStory([FromBody] Story story)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteStoryAsync([FromRoute] Guid id)
         {
-            var storyInDb = _context.Stories.FirstOrDefault(s => s.Id == story.Id);
-            if (storyInDb == null)
-                _context.Stories.Add(story);
-            else return new JsonResult(new { error = $"A story with ID {story.Id} already exists" }) { StatusCode = 2147024809 };
-
-            await _context.SaveChangesAsync();
-            return new JsonResult(Ok(story));
-        }
-
-        [Route("EditStory")]
-        [HttpPut]
-        public async Task<IActionResult> EditStory([FromBody] Story storyToEdit)
-        {
-            _context.Stories.Update(storyToEdit);
-
-            await _context.SaveChangesAsync();
-            return new JsonResult(Ok(storyToEdit));
-        }
-
-        [Route("DeleteStory")]
-        [HttpDelete]
-        public async Task<IActionResult> DeleteStory(Guid id)
-        {
-            var storyToDelete = await _context.Stories.FindAsync(id);
-            if (storyToDelete == null)
-                return new JsonResult(new { error = $"Story with ID {id} not found" }) { StatusCode = 404 };
-
-            _context.Stories.Remove(storyToDelete);
-            await _context.SaveChangesAsync();
-            return new JsonResult(Ok(storyToDelete));
+            try
+            {
+                _logger.LogInformation("DeleteStoryAsync started");
+                bool result = await _storiesService.DeleteStoryAsync(id);
+                if (result)
+                {
+                    return new JsonResult(Ok(SuccessMessageEnum.ElementSuccessfullyDeleted));
+                }
+                return BadRequest(ErrorMessagesEnum.NoElementFound);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Validation exception {ex.Message}");
+                return StatusCode((int)HttpStatusCode.InternalServerError, ex.Message);
+            }
         }
     }
 }

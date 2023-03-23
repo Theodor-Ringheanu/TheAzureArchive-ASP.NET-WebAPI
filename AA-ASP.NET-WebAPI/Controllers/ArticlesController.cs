@@ -2,8 +2,8 @@
 using System.Net;
 using TheAzureArchiveAPI.Helpers;
 using TheAzureArchiveAPI.Services;
-using TheAzureArchiveAPI.DataTransferObjects;
-using TheAzureArchiveAPI.DataTransferObjects.CreateUpdateObjects;
+using TheAzureArchiveAPI.DataTransferObjects.GetObjects;
+using TheAzureArchiveAPI.DataTransferObjects.UpdateObjects;
 using TheAzureArchiveAPI.Models;
 using TheAzureArchiveAPI.DataTransferObjects.PatchObjects;
 
@@ -63,7 +63,7 @@ namespace TheAzureArchiveAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateArticleAsync([FromBody] GetArticle article)
+        public async Task<IActionResult> CreateArticleAsync([FromBody] Article article)
         {
             try
             {
@@ -83,7 +83,7 @@ namespace TheAzureArchiveAPI.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateArticle([FromRoute] Guid id, [FromBody] CreateUpdateArticle article)
+        public async Task<IActionResult> UpdateArticle([FromRoute] Guid id, [FromBody] UpdateArticle article)
         {
             try
             {
@@ -92,12 +92,12 @@ namespace TheAzureArchiveAPI.Controllers
                 {
                     return BadRequest(ErrorMessagesEnum.BadRequest);
                 }
-                CreateUpdateArticle updatedArticle = await _articlesService.UpdateArticleAsync(id, article);
+                UpdateArticle updatedArticle = await _articlesService.UpdateArticleAsync(id, article);
                 if (updatedArticle == null)
                 {
                     return StatusCode((int)HttpStatusCode.NoContent, ErrorMessagesEnum.NoElementFound);
                 }
-                return new JsonResult(Ok(SuccessMessageEnum.ElementSuccessfullyUpdated));
+                return Ok(SuccessMessageEnum.ElementSuccessfullyUpdated);
             }
             catch (ModelValidationException ex)
             {

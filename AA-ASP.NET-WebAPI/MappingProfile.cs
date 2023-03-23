@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using TheAzureArchiveAPI.DataTransferObjects;
-using TheAzureArchiveAPI.DataTransferObjects.CreateUpdateObjects;
+using TheAzureArchiveAPI.DataTransferObjects.GetObjects;
+using TheAzureArchiveAPI.DataTransferObjects.UpdateObjects;
 
 namespace TheAzureArchiveAPI
 {
@@ -8,7 +8,8 @@ namespace TheAzureArchiveAPI
     {
         public MappingProfile() 
         {
-            CreateMap<GetArticle, CreateUpdateArticle>().ReverseMap();
+            CreateMap<Story, UpdateStory>().ReverseMap();
+            CreateMap<Article, UpdateArticle>().ReverseMap();
         }
     }
 }
