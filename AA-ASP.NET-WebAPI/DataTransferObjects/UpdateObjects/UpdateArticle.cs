@@ -18,7 +18,7 @@ namespace TheAzureArchiveAPI.DataTransferObjects.UpdateObjects
         public string Author { get; set; }
 
         [Required(ErrorMessage = "This field is mandatory")]
-        public DateTime PublicationDate { get; set; }
+        public DateOnly PublicationDate { get; set; }
 
         [Required(ErrorMessage = "This field is mandatory")]
         [StringLength(500, ErrorMessage = "ImageUrl field may only contain a maximum of 500 characters")]

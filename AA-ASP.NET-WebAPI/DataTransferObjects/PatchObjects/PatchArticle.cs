@@ -15,7 +15,7 @@ namespace TheAzureArchiveAPI.DataTransferObjects.PatchObjects
         [StringLength(250, ErrorMessage = "Author field may only contain a maximum of 250 characters")]
         public string? Author { get; set; }
 
-        public DateTime? PublicationDate { get; set; }
+        public DateOnly? PublicationDate { get; set; }
 
 
         [StringLength(500, ErrorMessage = "ImageUrl field may only contain a maximum of 500 characters")]
