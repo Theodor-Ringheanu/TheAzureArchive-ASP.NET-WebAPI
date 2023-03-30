@@ -41,7 +41,5 @@ namespace TheAzureArchiveAPI.Services
         {
             return await _repository.DeleteArticleAsync(id);
         }
-
     }
-
 }
