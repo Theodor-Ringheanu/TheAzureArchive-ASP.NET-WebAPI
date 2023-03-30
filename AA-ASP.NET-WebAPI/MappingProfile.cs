@@ -10,6 +10,8 @@ namespace TheAzureArchiveAPI
         {
             CreateMap<Story, UpdateStory>().ReverseMap();
             CreateMap<Article, UpdateArticle>().ReverseMap();
+            CreateMap<EmailSubscribed, UpdateEmailSubscribed>().ReverseMap();
+            CreateMap<News, UpdateNews>().ReverseMap();
         }
     }
 }

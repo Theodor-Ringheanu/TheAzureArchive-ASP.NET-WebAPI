@@ -15,6 +15,6 @@ namespace TheAzureArchiveAPI.DataTransferObjects.GetObjects
         public bool IsSubscribed { get; set; }
 
         [Required(ErrorMessage = "This field is mandatory")]
-        public DateTime DateSubscribed { get; set; }
+        public DateTime DateAdded { get; set; }
     }
 }

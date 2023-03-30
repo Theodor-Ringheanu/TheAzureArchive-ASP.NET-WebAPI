@@ -50,6 +50,9 @@ internal class Program
         builder.Services.AddTransient<IEmailsSubscribedRepository, EmailsSubscribedRepository>();
         builder.Services.AddTransient<IEmailsSubscribedService, EmailsSubscribedService>();
 
+        builder.Services.AddTransient<INewsRepository, NewsRepository>();
+        builder.Services.AddTransient<INewsService, NewsService>();
+
         builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         var app = builder.Build();
 

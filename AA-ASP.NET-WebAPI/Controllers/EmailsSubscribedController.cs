@@ -95,13 +95,18 @@ namespace TheAzureArchiveAPI.Controllers
         {
             try
             {
-                _logger.LogInformation("AddEmailAsync started");
+                _logger.LogInformation("AddEmail started");
                 if (email == null)
                 {
                     return BadRequest(ErrorMessagesEnum.BadRequest);
                 }
                 await _emailsSubscribedService.AddEmailAsync(email);
                 return new JsonResult(Ok(SuccessMessageEnum.ElementSuccessfullyCreated));
+            }
+            catch (ModelValidationException ex)
+            {
+                _logger.LogError($"Validation exception {ex.Message}");
+                return BadRequest(ex.Message);
             }
             catch (Exception ex)
             {
